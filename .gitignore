@@ -1,0 +1,17 @@
+.cache
+.classpath
+.dependencies.webdsl
+.project
+.saved-but-not-built
+.servletapp
+.settings
+.webdsl-fragment-cache
+WebContent
+.webdsl-parsecache
+application.ini
+build.xml
+chitter build.xml.launch
+chitter clean-project.xml.launch
+clean-project.xml
+.DS_Store
+

@@ -1,0 +1,24 @@
+:root {
+    --fa-style-family: "Font Awesome 6 Pro";
+    --fa-style: 400;
+    --fa-border-color: red;
+    --fa-primary-color: white;
+    --fa-secondary-color: black;
+}
+
+.navbar-contents {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+.all-centered {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.all-centered > * {
+	margin: 4px;
+}
