@@ -3,21 +3,26 @@ module models
 entity User {
 	username: String (name, id)
 	password: Secret
-	tag: String ( validate ( isUniqueTag() , "tag needs ot be unique") )
 	super: Bool
 	cheets: {Cheet} (inverse = author)
 	followers: {User}
-	following: {User}
+	following: {User} ( inverse = followers )
 	predicate sameUser( u: User ){ this == u }
-	predicate isUniqueTag(){ (from User as u where u.tag = ~this.tag).length <= 1 }
+	
+	predicate isFollowing( user: User ){ user in this.following }
+	
+	search mapping {
+		+username
+	}
 }
 
 entity Cheet {
 	author: User
 	message: WikiText
+//	predicate isRecheetedBy( u: User ){ (from Recheet as rc where rc.rcer = u and cheet = this).length == 1 }
 }
 
-entity Like {
-	actor: User
+entity Recheet {
+	rcer: User
 	cheet: Cheet
 }

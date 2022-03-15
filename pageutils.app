@@ -15,8 +15,8 @@ template deps {
 
 template main {
 	deps
-	includeCSS("chitter.css")
 	includeCSS("bulma.min.css")
+	includeCSS("chitter.css")
 	elements
 }
 
@@ -29,5 +29,25 @@ template searchButton {
 }
 
 template i {
-	<i all attributes></i>
+	<i all attributes>
+	elements
+	</i>
+}
+
+template p {
+	<p all attributes>
+		elements
+	</p>
+}
+
+template footer {
+	<footer all attributes>
+	elements
+	</footer>
+}
+
+template button {
+	<button all attributes>
+	elements
+	</button>
 }

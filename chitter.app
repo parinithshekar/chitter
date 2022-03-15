@@ -12,6 +12,7 @@ access control rules
   rule page root{ true }
   rule page feed{ loggedIn() }
   rule page search{ loggedIn() }
+  rule page userProfile(user: User) { loggedIn() }
 
 section rootPage
 
@@ -24,12 +25,6 @@ page root {
 		else {
 			login
 			registrationTemplate
-		}
-		
-		table{
-			for (u: User ) {
-				derive viewRows from u
-			}
 		}
 	}
 }
