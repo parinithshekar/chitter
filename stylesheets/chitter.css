@@ -11,6 +11,10 @@
 	align-items: center;
 }
 
+.flex-vertical {
+	flex-direction: column;
+}
+
 .all-centered > * {
 	margin: 4px;
 }
@@ -74,7 +78,6 @@
 
 .webdsl-placeholder > * {
 	margin: 4px;
-	place-self: center;
 }
 
 .user-intro {

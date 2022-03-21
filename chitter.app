@@ -24,33 +24,8 @@ page root {
 		}
 		else {
 			login
+			<hr>
 			registrationTemplate
 		}
-	}
-}
-
-
-override template login {
-	var username : String
-	var password : Secret
-	var stayLoggedIn := false
-	form {
-		<fieldset>
-		<legend>
-			output( "Login" )
-		</legend>
-		<table>
-			<tr>labelcolumns( "Username: " ){ input( username ) }</tr>
-			<tr>labelcolumns( "Password: " ){ input( password ) }</tr>
-			<tr>labelcolumns( "Stay logged in: " ){ input( stayLoggedIn ) } </tr>
-		</table>
-		submit signinAction() { "Login" }
-		</fieldset>
-	}
-	action signinAction {
-		getSessionManager().stayLoggedIn := stayLoggedIn;
-		validate( authenticate( username, password ), "The login credentials are not valid.");
-//		message( "You are now logged in." );
-		return feed();
 	}
 }

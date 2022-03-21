@@ -51,3 +51,9 @@ template button {
 	elements
 	</button>
 }
+
+template label {
+	<label all attributes>
+	elements
+	</label>
+}

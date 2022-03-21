@@ -20,17 +20,85 @@ template loggedInMessage {
 	}
 }
 
+override template login {
+	var username : String
+	var password : Secret
+	var stayLoggedIn := false
+	form[class="all-centered flex-vertical"] {
+		h1[class="is-size-2 has-text-link"] { "Welcome back!" }
+		div {
+			div[class="field"] {
+				label[class="label"] {"Username"}
+				div[class="control"] {
+					input(username)[class="input", type="text", placeholder="username"]
+				}
+			}
+			div[class="field"] {
+				label[class="label"] {"Password"}
+				div[class="control"] {
+					input(password)[class="input", type="password", placeholder="Type you password"]
+				}
+			}
+			div[class="field"] {
+				div[class="control"] {
+					label[class="checkbox"] {					
+						input(stayLoggedIn)[type="checkbox"]
+						" Stay logged in"
+					}
+				}
+			}
+		}
+		div[class="field"] {
+			div[class="control"] {
+				submit signinAction()[class="button is-link"] { "Login" }
+			}
+		}
+			
+	}
+	action signinAction {
+		getSessionManager().stayLoggedIn := stayLoggedIn;
+		validate( authenticate( username, password ), "The login credentials are not valid.");
+		return feed();
+	}
+}
+
 template registrationTemplate {
-	h3{ "Registration" }
 	var newuser := User{}
-	form {
-		input( newuser.username )
-		input( newuser.password )
-		input( newuser.super )
-		submit action{
-			newuser.password := newuser.password.digest();
-			newuser.save();
-		}{ "Register" }
+	form[class="all-centered flex-vertical"] {
+		h1[class="is-size-2 has-text-link"] { "Create an account" }
+		div {
+			div[class="field"] {
+				label[class="label"] {"Username"}
+				div[class="control"] {
+					input(newuser.username)[class="input", type="text", placeholder="username"]
+				}
+			}
+			div[class="field"] {
+				label[class="label"] {"Password"}
+				div[class="control"] {
+					input(newuser.password)[class="input", type="password", placeholder="Type you password"]
+				}
+			}
+			div[class="field"] {
+				div[class="control"] {
+					label[class="checkbox"] {					
+						input(newuser.super)[type="checkbox"]
+						" Become a superuser "
+						i[class="fa-solid fa-fire has-text-danger"]
+					}
+				}
+			}
+		}
+		validate (!newuser.password.contains(" "), "Password cannot contain spaces")
+		validate (newuser.password.length() >= 8, "Minimum 8 characters")
+		div[class="field"] {
+			div[class="control"] {
+				submit action{
+					newuser.password := newuser.password.digest();
+					newuser.save();
+				}[class="button is-link"] { "Register" }
+			}
+		}
 	}
 }
 
@@ -47,15 +115,26 @@ template navbarWith {
 		div[class="container is-max-desktop"] {
 			div[class="navbar-contents"] {
 				div[class="all-centered"]{
-					navigate feed() {						
-						i[class="fa-brands fa-twitter fa-2x"]
-						span[class="has-text-centered has-text-weight-semibold"] { "Chitter" }
-					}
+					chitterNavigate
 				}
 				div[class="all-centered"]{
 					elements	
 				}
 			}
+		}
+	}
+}
+
+template chitterNavigate {
+	if(!loggedIn()) {
+		div[class="all-centered"] {	
+			i[class="fa-brands fa-twitter fa-2x"]
+			span[class="has-text-centered has-text-weight-semibold"] { "Chitter" }
+		}
+	} else {
+		navigate feed()[class="all-centered"] {						
+			i[class="fa-brands fa-twitter fa-2x"]
+			span[class="has-text-centered has-text-weight-semibold"] { "Chitter" }
 		}
 	}
 }
@@ -152,14 +231,18 @@ template cheetTemplate(recheet: Recheet) {
 		div[class="card-content"]{
 			navigate userProfile(recheet.cheet.author) {
 				div[class="subtitle has-text-weight-semibold"]{
-					"@~recheet.cheet.author.username"
+					usernameTemplate(recheet.cheet.author)
+					// "@~recheet.cheet.author.username"
 				}
 			}
 			div[class="subtitle"]{
 				~recheet.cheet.message
 			}
 			div[class="subtitle recheet-section"]{
-				recheetedBySection(recheet.rcer)
+				div[class="subtitle has-text-weight-light has-text-grey-light no-bottom-margin"] {
+					superFire(recheet.rcer)
+					recheetedBySection(recheet.rcer)
+				}
 				recheetSection(recheet.cheet)
 			}
 		}
@@ -168,18 +251,25 @@ template cheetTemplate(recheet: Recheet) {
 
 template recheetedBySection(user: User) {
 	if (user != null ) {
-		div[class="subtitle has-text-weight-light has-text-grey-light no-bottom-margin"] {
-			"Recheeted by "
-			navigate userProfile(user) {
-				span{
-					"@~user.username"
-				}
+		"Recheeted by "
+		navigate userProfile(user) {
+			span{
+				"@~user.username"
 			}
 		}
 	} else {
 		div[class="subtitle has-text-weight-light has-text-grey-light no-bottom-margin"] {
 			""
 		}
+	}
+}
+
+template superFire(u1: User) {
+	if (u1 != null && u1.super) {
+		i[class="fa-solid fa-fire has-text-danger"]
+		" "
+	} else {
+		""
 	}
 }
 
@@ -214,9 +304,11 @@ page search {
 						type="text",
 						placeholder="Search by username",
 						oninput = action{
+							query := query + "*";
 							replace( results );
 						},
 						onsubmit = action{
+							query := query + "*";
 							replace( results );
 						}
 					]
@@ -227,6 +319,8 @@ page search {
 			placeholder results {
 				if (query != "") {
 					// TODO: fix search
+					
+					/*
 					for ( u in
 						[ u | u in (from User)
 							where
@@ -235,13 +329,15 @@ page search {
 						]
 					) {
 						searchResultUser(u)
+					}*/
+					
+					
+					for (u in (results from search User matching query)) {
+						if (!principal.sameUser(u)) {							
+							searchResultUser(u)
+						}
 					}
 					
-					/*
-					for (u in (results from search User matching query)) {
-						searchResultUser(u)
-					}
-					*/
 				}
 			}
 		}
@@ -253,11 +349,19 @@ template searchResultUser(user: User) {
 		div[class="card"] {
 			div[class="card-content"] {
 				div[class="subtitle user-name"] {
-					"@~user.username"
+					usernameTemplate(user)
 				}
 			}
 		}
 	}
+}
+
+template usernameTemplate(user: User) {
+	if (user.super) {
+		i[class="fa-solid fa-fire has-text-danger"]
+		" "
+	}
+	"@~user.username"
 }
 
 page userProfile(user: User) {
@@ -267,14 +371,26 @@ page userProfile(user: User) {
 	}
 }
 
-// TODO: add follow button
 template userIntro(user: User) {
-	div[class="block is-size-3 user-intro"]{
-		div[class="has-text-info"]{
-			"@~user.username's cheets"
+	if (user.super) {
+		div[class="block is-size-3 user-intro"]{
+			div[class="has-text-info"]{
+				i[class="fa-solid fa-fire has-text-danger"]
+				" "
+				"@~user.username's cheets"
+			}
+			div[class="subtitle user-follow-button"]{
+				followButtonTemplate(user)
+			}
 		}
-		div[class="subtitle user-follow-button"]{
-			followButtonTemplate(user)
+	} else {
+		div[class="block is-size-3 user-intro"]{
+			div[class="has-text-info"]{
+				"@~user.username's cheets"
+			}
+			div[class="subtitle user-follow-button"]{
+				followButtonTemplate(user)
+			}
 		}
 	}
 }
@@ -286,7 +402,6 @@ template userCheetFeed(user: User) {
 	}
 	init {
 		// Use Recheet entity schema as a temporary dict 
-		// TODO: improve how to fetch cheets
 		recheets.addAll([Recheet{ cheet := cheet rcer := null} | cheet in user.cheets]);
 		recheets.addAll((from Recheet as rc where rc.rcer = ~user));
 	}
