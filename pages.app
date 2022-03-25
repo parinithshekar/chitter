@@ -53,7 +53,6 @@ override template login {
 				submit signinAction()[class="button is-link"] { "Login" }
 			}
 		}
-			
 	}
 	action signinAction {
 		getSessionManager().stayLoggedIn := stayLoggedIn;
