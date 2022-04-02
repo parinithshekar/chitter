@@ -20,7 +20,6 @@ entity User {
 entity Cheet {
 	author: User
 	message: WikiText
-//	predicate isRecheetedBy( u: User ){ (from Recheet as rc where rc.rcer = u and cheet = this).length == 1 }
 }
 
 entity Recheet {
@@ -29,7 +28,6 @@ entity Recheet {
 }
 
 analyzer usernameAnalyzer {
-  // tokenizer = PatternTokenizer(pattern="([a-z])", group="1")
   tokenizer = StandardTokenizer
   token filter = LowerCaseFilter
   token filter = NGramFilter(minGramSize = "1", maxGramSize = "50")

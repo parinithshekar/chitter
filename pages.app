@@ -201,14 +201,12 @@ template cheetFeed {
 	div[class="block cheet-feed"]{
 		displayCheets(recheets)
 	}
-	init {
-		// cheets.addAll(principal.cheets);
-		// Use Recheet entity schema as a temporary dict
-		
+	init {		
 		// Base cheeters to get cheets from are users the principal is following and super users
 		var cheeters : {User};
 		cheeters.addAll(principal.following);
 		cheeters.addAll((from User as u where u.super = true));
+		// Use Recheet entity schema as a temporary dict
 		for (cs in [ f.cheets | f in cheeters]) {
 			recheets.addAll([Recheet{ cheet := cheet rcer := null} | cheet in cs]);
 		}
@@ -231,7 +229,6 @@ template cheetTemplate(recheet: Recheet) {
 			navigate userProfile(recheet.cheet.author) {
 				div[class="subtitle has-text-weight-semibold"]{
 					usernameTemplate(recheet.cheet.author)
-					// "@~recheet.cheet.author.username"
 				}
 			}
 			div[class="subtitle"]{
@@ -291,7 +288,7 @@ template recheetSection(cheet: Cheet) {
 	}
 }
 
-// TODO: fix search based on username
+
 page search {
 	request var query := ""
 	default {
@@ -317,7 +314,6 @@ page search {
 		div[class="block search-results"] {			
 			placeholder results {
 				if (query != "") {
-					// TODO: fix search
 					
 					/*
 					for ( u in
@@ -328,7 +324,8 @@ page search {
 						]
 					) {
 						searchResultUser(u)
-					}*/
+					}
+					*/
 					
 					
 					for (u in (results from search User matching query)) {
